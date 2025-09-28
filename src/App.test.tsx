@@ -72,4 +72,35 @@ describe("App 통합 테스트", () => {
     // 리스트에서 제거됐는지 확인
     expect(screen.queryByText("삭제할 일")).not.toBeInTheDocument();
   });
+
+  it("완료버튼을 클릭하면 선택된 할 일의 수정사항을 적용한다", async () => {
+    renderWithProvider();
+    const input = screen.getByPlaceholderText("새 할 일을 입력하세요...");
+    const addButton = screen.getByRole("button", { name: "addButton" });
+
+    // 할 일 추가
+    await userEvent.type(input, "수정할 일");
+    await userEvent.click(addButton);
+
+    // 수정 버튼 클릭
+    const todoRow = screen.getByText("수정할 일").closest("div")!;
+    const updateButton = within(todoRow).getByRole("button", {
+      name: "updateButton",
+    });
+    await userEvent.click(updateButton);
+
+    // 완료 버튼 클릭
+    const updateInput = within(todoRow).getByRole("textbox", {
+      name: "updateInput",
+    });
+    const submitButton = within(todoRow).getByRole("button", {
+      name: "submitButton",
+    });
+    await userEvent.type(updateInput, "수정된 일");
+    await userEvent.click(submitButton);
+
+    expect(
+      await screen.findByText((content) => content.includes("수정된 일"))
+    ).toBeInTheDocument();
+  });
 });
