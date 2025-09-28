@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 import { TodoItem } from "./store/todoSlice";
 import TodoContent from "./TodoContent";
+import userEvent from "@testing-library/user-event";
 
 describe("TodoContent 단위테스트", () => {
   const mockTodo: TodoItem = {
@@ -55,5 +56,43 @@ describe("TodoContent 단위테스트", () => {
 
     // deleteMock이 id=1로 실행되었는지 확인
     expect(deleteMock).toHaveBeenCalledWith("1");
+  });
+
+  // TDD로 할 일 수정 기능 구현하기 - 1
+  it("작성된 할 일을 수정할 수 있다", async () => {
+    // Arrangement
+    const updateMock = vi.fn();
+    render(
+      <TodoContent
+        item={mockTodo}
+        handleOnClickToggle={() => {}}
+        handleOnClickDelete={() => {}}
+        handleOnClickUpdate={updateMock}
+      />
+    );
+
+    // Action
+    const updateButton = screen.getByRole("button", { name: "update" });
+    await userEvent.click(updateButton);
+
+    // Assertion - 완료버튼으로 변경되는지 확인
+    expect(screen.getByRole("button", { name: "submit" })).toBeInTheDocument();
+    // Assertion - input으로 변경되는지 확인
+    expect(screen.getByDisplayValue("테스트 할 일")).toBeInTheDocument();
+
+    // Action
+    const submitButton = screen.getByRole("button", { name: "submit" });
+    // const input = screen.getByRole("input", {name: "update"})
+    const input = screen.getByDisplayValue("테스트 할 일");
+    await userEvent.clear(input);
+    await userEvent.type(input, "수정된 할 일");
+    await userEvent.click(submitButton);
+
+    // Assertion - 수정버튼으로 변경되는지 확인
+    expect(screen.getByRole("button", { name: "update" })).toBeInTheDocument();
+    // Assertion - span으로 변경되고 수정한 내용으로 변경되는지 확인
+    expect(screen.getByText("수정된 할 일")).toBeInTheDocument();
+    // handleOnClickUpdate를 호출하는지 확인
+    expect(updateMock).toHaveBeenCalledWith("1", "수정된 할 일");
   });
 });
