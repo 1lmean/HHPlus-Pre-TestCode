@@ -22,8 +22,8 @@ describe("App 통합 테스트", () => {
 
   it("새 할 일을 추가한다", async () => {
     renderWithProvider();
-    const input = screen.getByRole("textbox", { name: "add" });
-    const addButton = screen.getByRole("button", { name: "add" });
+    const input = screen.getByRole("textbox", { name: "addInput" });
+    const addButton = screen.getByRole("button", { name: "addButton" });
 
     await userEvent.type(input, "통합 테스트 할 일");
     await userEvent.click(addButton);
@@ -36,8 +36,8 @@ describe("App 통합 테스트", () => {
 
   it("체크박스를 클릭하면 할 일이 완료 상태로 이동한다", async () => {
     renderWithProvider();
-    const input = screen.getByRole("textbox", { name: "add" });
-    const addButton = screen.getByRole("button", { name: "add" });
+    const input = screen.getByRole("textbox", { name: "addInput" });
+    const addButton = screen.getByRole("button", { name: "addButton" });
 
     // 할 일 추가
     await userEvent.type(input, "완료할 일");
@@ -56,7 +56,7 @@ describe("App 통합 테스트", () => {
   it("삭제버튼을 클릭하면 선택된 할 일을 삭제한다", async () => {
     renderWithProvider();
     const input = screen.getByPlaceholderText("새 할 일을 입력하세요...");
-    const addButton = screen.getByRole("button", { name: "add" });
+    const addButton = screen.getByRole("button", { name: "addButton" });
 
     // 할 일 추가
     await userEvent.type(input, "삭제할 일");
@@ -65,7 +65,7 @@ describe("App 통합 테스트", () => {
     // 삭제 버튼 클릭
     const todoRow = screen.getByText("삭제할 일").closest("div")!;
     const deleteButton = within(todoRow).getByRole("button", {
-      name: "delete",
+      name: "deleteButton",
     });
     await userEvent.click(deleteButton);
 

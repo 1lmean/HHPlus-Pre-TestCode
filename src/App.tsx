@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./store";
-import { TodoItem, addTodo, toggleTodo, deleteTodo } from "./store/todoSlice";
+import {
+  TodoItem,
+  addTodo,
+  toggleTodo,
+  deleteTodo,
+  updateTodo,
+} from "./store/todoSlice";
 
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -28,6 +34,10 @@ export default function App() {
     dispatch(deleteTodo(id));
   };
 
+  const handleOnClickUpdate = (id: string, text: string) => {
+    dispatch(updateTodo({ id: id, text: text }));
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleOnClickAdd();
@@ -43,14 +53,14 @@ export default function App() {
         {/* Input Section */}
         <div className="flex gap-2 mb-6">
           <Input
-            aria-label="add"
+            aria-label="addInput"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="새 할 일을 입력하세요..."
             className="flex-1"
           />
-          <Button aria-label="add" onClick={handleOnClickAdd}>
+          <Button aria-label="addButton" onClick={handleOnClickAdd}>
             추가
           </Button>
         </div>
@@ -67,6 +77,7 @@ export default function App() {
                   item={todo}
                   handleOnClickToggle={handleOnclickToggle}
                   handleOnClickDelete={handleOnClickDelete}
+                  handleOnClickUpdate={handleOnClickUpdate}
                 />
               ))}
               {activeTodos.length === 0 && (
@@ -89,6 +100,7 @@ export default function App() {
                   item={todo}
                   handleOnClickToggle={handleOnclickToggle}
                   handleOnClickDelete={handleOnClickDelete}
+                  handleOnClickUpdate={handleOnClickUpdate}
                 />
               ))}
               {completedTodos.length === 0 && (

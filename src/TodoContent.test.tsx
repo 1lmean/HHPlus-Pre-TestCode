@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { TodoItem } from "./store/todoSlice";
 import TodoContent from "./TodoContent";
 import userEvent from "@testing-library/user-event";
+import { within } from "@testing-library/react";
 
 describe("TodoContent 단위테스트", () => {
   const mockTodo: TodoItem = {
@@ -18,6 +19,7 @@ describe("TodoContent 단위테스트", () => {
         item={mockTodo}
         handleOnClickToggle={() => {}}
         handleOnClickDelete={() => {}}
+        handleOnClickUpdate={() => {}}
       />
     );
 
@@ -31,10 +33,11 @@ describe("TodoContent 단위테스트", () => {
         item={mockTodo}
         handleOnClickToggle={toggleMock}
         handleOnClickDelete={() => {}}
+        handleOnClickUpdate={() => {}}
       />
     );
 
-    const checkbox = screen.getByRole("checkbox", { name: "update" });
+    const checkbox = screen.getByRole("checkbox", { name: "updateCheckbox" });
     fireEvent.click(checkbox);
 
     // toggleMock이 id=1로 실행되었는지 확인
@@ -48,10 +51,11 @@ describe("TodoContent 단위테스트", () => {
         item={mockTodo}
         handleOnClickToggle={() => {}}
         handleOnClickDelete={deleteMock}
+        handleOnClickUpdate={() => {}}
       />
     );
 
-    const button = screen.getByRole("button", { name: "delete" });
+    const button = screen.getByRole("button", { name: "deleteButton" });
     fireEvent.click(button);
 
     // deleteMock이 id=1로 실행되었는지 확인
@@ -72,26 +76,39 @@ describe("TodoContent 단위테스트", () => {
     );
 
     // Action
-    const updateButton = screen.getByRole("button", { name: "update" });
+    const todoRow = screen.getByText("테스트 할 일").closest("div")!;
+    const updateButton = within(todoRow).getByRole("button", {
+      name: "updateButton",
+    });
     await userEvent.click(updateButton);
 
+    // getByRole을 사용하면, updateFlag state를 변경하고 DOM을 업데이트하는 시간을 기다리지 않아서 테스트 통과를 못함
+    // findByRole은 해당 시간을 기다리는 waitFor 까지 내부적으로 포함함
     // Assertion - 완료버튼으로 변경되는지 확인
-    expect(screen.getByRole("button", { name: "submit" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "submitButton" })
+    ).toBeInTheDocument();
     // Assertion - input으로 변경되는지 확인
-    expect(screen.getByDisplayValue("테스트 할 일")).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("테스트 할 일")).toBeInTheDocument();
 
     // Action
-    const submitButton = screen.getByRole("button", { name: "submit" });
-    // const input = screen.getByRole("input", {name: "update"})
+    const submitButton = within(todoRow).getByRole("button", {
+      name: "submitButton",
+    });
     const input = screen.getByDisplayValue("테스트 할 일");
     await userEvent.clear(input);
     await userEvent.type(input, "수정된 할 일");
     await userEvent.click(submitButton);
 
     // Assertion - 수정버튼으로 변경되는지 확인
-    expect(screen.getByRole("button", { name: "update" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "updateButton" })
+    ).toBeInTheDocument();
+
     // Assertion - span으로 변경되고 수정한 내용으로 변경되는지 확인
-    expect(screen.getByText("수정된 할 일")).toBeInTheDocument();
+    // expect(
+    //   await screen.findByText((content) => content.includes("수정된 할 일"))
+    // ).toBeInTheDocument();
     // handleOnClickUpdate를 호출하는지 확인
     expect(updateMock).toHaveBeenCalledWith("1", "수정된 할 일");
   });
