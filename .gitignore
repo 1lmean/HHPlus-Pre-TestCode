@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# production build
+dist/
+
+# optional caches
+.cache/
+.vite/
+*.tsbuildinfo
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor settings
+.vscode/
+.idea/
+
+# system files
+.DS_Store
+Thumbs.db
+
+# env files
+.env
+.env.*
+
+# vitest
+coverage/
+*.log
