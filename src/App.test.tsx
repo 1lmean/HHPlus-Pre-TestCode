@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { store } from "./store";
@@ -22,7 +22,7 @@ describe("App 통합 테스트", () => {
 
   it("새 할 일을 추가한다", async () => {
     renderWithProvider();
-    const input = screen.getByRole("input", { name: "add" });
+    const input = screen.getByRole("textbox", { name: "add" });
     const addButton = screen.getByRole("button", { name: "add" });
 
     await userEvent.type(input, "통합 테스트 할 일");
@@ -36,7 +36,7 @@ describe("App 통합 테스트", () => {
 
   it("체크박스를 클릭하면 할 일이 완료 상태로 이동한다", async () => {
     renderWithProvider();
-    const input = screen.getByRole("input", { name: "add" });
+    const input = screen.getByRole("textbox", { name: "add" });
     const addButton = screen.getByRole("button", { name: "add" });
 
     // 할 일 추가
@@ -44,7 +44,8 @@ describe("App 통합 테스트", () => {
     await userEvent.click(addButton);
 
     // 토글
-    const checkbox = screen.getByRole("checkbox", { name: "update" });
+    const todoRow = screen.getByText("완료할 일").closest("div")!;
+    const checkbox = within(todoRow).getByRole("checkbox");
     await userEvent.click(checkbox);
 
     // 완료됨 영역에 표시됐는지 확인
@@ -62,7 +63,10 @@ describe("App 통합 테스트", () => {
     await userEvent.click(addButton);
 
     // 삭제 버튼 클릭
-    const deleteButton = screen.getByRole("button", { name: "delete" });
+    const todoRow = screen.getByText("삭제할 일").closest("div")!;
+    const deleteButton = within(todoRow).getByRole("button", {
+      name: "delete",
+    });
     await userEvent.click(deleteButton);
 
     // 리스트에서 제거됐는지 확인
