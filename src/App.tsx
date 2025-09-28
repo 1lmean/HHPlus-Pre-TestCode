@@ -5,8 +5,6 @@ import { TodoItem, addTodo, toggleTodo, deleteTodo } from "./store/todoSlice";
 
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
-import { Checkbox } from "./components/ui/checkbox";
-import { Trash2 } from "lucide-react";
 import TodoContent from "./TodoContent";
 
 export default function App() {
