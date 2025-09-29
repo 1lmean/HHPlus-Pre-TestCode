@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, findByRole } from "@testing-library/react";
 
 import { TodoItem } from "./store/todoSlice";
 import TodoContent from "./TodoContent";
@@ -84,12 +84,15 @@ describe("TodoContent 단위테스트", () => {
 
     // getByRole을 사용하면, updateFlag state를 변경하고 DOM을 업데이트하는 시간을 기다리지 않아서 테스트 통과를 못함
     // findByRole은 해당 시간을 기다리는 waitFor 까지 내부적으로 포함함
+
     // Assertion - 완료버튼으로 변경되는지 확인
     expect(
       await screen.findByRole("button", { name: "submitButton" })
     ).toBeInTheDocument();
-    // Assertion - input으로 변경되는지 확인
-    expect(await screen.findByDisplayValue("테스트 할 일")).toBeInTheDocument();
+    // Assertion - span이 input으로 변경되는지 확인
+    // expect(await screen.findByDisplayValue("테스트 할 일")).toBeInTheDocument();
+    expect(screen.queryByText("테스트 할 일")).not.toBeInTheDocument();
+    expect(await screen.findByRole("textbox", { name: "updateInput" }));
 
     // Action
     const submitButton = within(todoRow).getByRole("button", {
@@ -104,12 +107,14 @@ describe("TodoContent 단위테스트", () => {
     expect(
       await screen.findByRole("button", { name: "updateButton" })
     ).toBeInTheDocument();
+    // Assertion - input이 사라졌는지 확인
+    expect(screen.queryByDisplayValue("수정된 할 일")).not.toBeInTheDocument();
+    // handleOnClickUpdate를 id=1, newText="수정된 할 일"의 파라미터로 호출하는지 확인
+    expect(updateMock).toHaveBeenCalledWith("1", "수정된 할 일");
 
-    // Assertion - span으로 변경되고 수정한 내용으로 변경되는지 확인
+    // Assertion - "수정된 할 일"이 적용됐는지 여부는 redux 상호작용까지 포함된 내용이므로 통합테스트에서 진행
     // expect(
     //   await screen.findByText((content) => content.includes("수정된 할 일"))
     // ).toBeInTheDocument();
-    // handleOnClickUpdate를 호출하는지 확인
-    expect(updateMock).toHaveBeenCalledWith("1", "수정된 할 일");
   });
 });
